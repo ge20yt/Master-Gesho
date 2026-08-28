@@ -16,27 +16,9 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAppContext } from '../contexts/AppContext';
 import { SkeletonToolCard } from '../components/ui/SkeletonToolCard';
 import { Tool } from '../services/mockData';
-
-export const HISTORY_STORAGE_KEY = '@mg_tool_history_v1';
-export const MAX_HISTORY_ITEMS = 50;
-
-export interface HistoryEntry {
-  toolId: string;
-  viewedAt: string; // ISO timestamp
-}
-
-/** Append or update a tool visit — call this from tool detail page */
-export async function recordToolView(toolId: string): Promise<void> {
-  try {
-    const raw = await AsyncStorage.getItem(HISTORY_STORAGE_KEY);
-    const history: HistoryEntry[] = raw ? JSON.parse(raw) : [];
-    // Remove existing entry for same toolId, then prepend fresh one
-    const filtered = history.filter(e => e.toolId !== toolId);
-    const updated: HistoryEntry[] = [{ toolId, viewedAt: new Date().toISOString() }, ...filtered];
-    // Enforce max cap
-    await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updated.slice(0, MAX_HISTORY_ITEMS)));
-  } catch {}
-}
+import {
+  HISTORY_STORAGE_KEY, MAX_HISTORY_ITEMS, HistoryEntry,
+} from '../services/historyService';
 
 // ─── Date grouping ─────────────────────────────────────────────────────────────
 type DateGroup = 'today' | 'week' | 'older';

@@ -25,7 +25,7 @@ import Animated, {
   withSpring, withSequence, withTiming, Easing,
 } from 'react-native-reanimated';
 import { useTheme } from '../../contexts/ThemeContext';
-import { recordToolView } from '../history';
+import { recordToolView } from '../../services/historyService';
 import { useAppContext } from '../../contexts/AppContext';
 import { useAuth } from '@/template';
 import ToolCard from '../../components/ToolCard';
