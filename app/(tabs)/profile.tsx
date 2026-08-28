@@ -872,6 +872,7 @@ export default function ProfileScreen() {
     {icon:'code',label:'الوصول لـ API',desc:'المفاتيح والتوثيق',action:()=>Haptics.selectionAsync()},
   ];
   const appSettings = [
+    {icon:'history',label:'سجل التصفح',desc:'الأدوات التي زرتها مؤخراً',action:()=>router.push('/history' as any)},
     {icon:'info',label:'عن التطبيق',desc:'الإصدار، القانوني، المطور',action:()=>router.push('/about')},
     {icon:'person-pin',label:'صفحة مستر جيشو',desc:'تعرف على المبرمج',action:()=>router.push('/developer-info')},
     {icon:'emoji-events',label:'الإنجازات',desc:`${unlockedAchievements.length} إنجاز مكتمل · ${totalPoints} نقطة`,action:()=>router.push('/achievements')},

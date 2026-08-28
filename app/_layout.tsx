@@ -45,6 +45,7 @@ function InnerLayout() {
           <Stack.Screen name="news" options={{ presentation: 'card', animation: 'slide_from_right' }} />
           <Stack.Screen name="post/[id]" options={{ presentation: 'card', animation: 'slide_from_right' }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false, animation: 'fade' }} />
+          <Stack.Screen name="history" options={{ presentation: 'card', animation: 'slide_from_right' }} />
           <Stack.Screen name="ai-chat" options={{ headerShown: false, presentation: 'card', animation: 'slide_from_bottom' }} />
           <Stack.Screen name="compare" options={{ headerShown: false, presentation: 'card', animation: 'slide_from_bottom' }} />
         </Stack>

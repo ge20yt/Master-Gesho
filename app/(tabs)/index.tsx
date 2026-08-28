@@ -30,6 +30,13 @@ import { getAIProfile } from '../../services/onboardingService';
 import { SkeletonToolCard } from '../../components/ui/SkeletonToolCard';
 import { SkeletonPostCard } from '../../components/ui/SkeletonPostCard';
 
+type FilterMode = 'all' | 'tools' | 'posts';
+const FILTER_TABS: { id: FilterMode; label: string; icon: string }[] = [
+  { id: 'all',   label: 'الكل',    icon: 'apps' },
+  { id: 'tools', label: 'أدوات',   icon: 'smart-toy' },
+  { id: 'posts', label: 'مقالات',  icon: 'article' },
+];
+
 const { width: SW } = Dimensions.get('window');
 const R = 20; // card border radius
 
@@ -533,6 +540,7 @@ export default function DiscoverScreen() {
   const [showAll, setShowAll] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [aiProfile, setAiProfile] = useState<any>(null);
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
 
   // Load onboarding AI profile once on mount
   useEffect(() => {
@@ -564,10 +572,17 @@ export default function DiscoverScreen() {
     [tools],
   );
 
+  // ── Filtered feed by mode ─────────────────────────────────────────────────
+  const filteredFeedItems = useMemo(() => {
+    if (filterMode === 'tools') return allFeedItems.filter(item => item.type === 'tool');
+    if (filterMode === 'posts') return allFeedItems.filter(item => item.type === 'post');
+    return allFeedItems;
+  }, [allFeedItems, filterMode]);
+
   // ── Visible feed (paginated) ───────────────────────────────────────────────
   const visibleItems = useMemo(
-    () => (showAll ? allFeedItems : allFeedItems.slice(0, 10)),
-    [allFeedItems, showAll],
+    () => (showAll ? filteredFeedItems : filteredFeedItems.slice(0, 10)),
+    [filteredFeedItems, showAll],
   );
 
   // ── Search results ─────────────────────────────────────────────────────────
@@ -675,6 +690,63 @@ export default function DiscoverScreen() {
         <View style={s.searchWrap}>
           <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
         </View>
+
+        {/* ── Filter Tabs ────────────────────────────────────────────────── */}
+        {!isSearching && (
+          <View style={s.filterBar}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.filterScroll}
+            >
+              {FILTER_TABS.map(tab => {
+                const active = filterMode === tab.id;
+                return (
+                  <Pressable
+                    key={tab.id}
+                    onPress={() => { Haptics.selectionAsync(); setFilterMode(tab.id); setShowAll(false); }}
+                    style={[
+                      s.filterChip,
+                      active
+                        ? { backgroundColor: theme.primary, borderColor: theme.primary }
+                        : { backgroundColor: theme.surface, borderColor: theme.border },
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityLabel={tab.label}
+                  >
+                    <MaterialIcons
+                      name={tab.icon as any}
+                      size={14}
+                      color={active ? '#FFF' : theme.textMuted}
+                    />
+                    <Text style={[
+                      s.filterChipText,
+                      active ? { color: '#FFF', fontFamily: 'Cairo_700Bold' } : { color: theme.textSecondary },
+                    ]}>
+                      {tab.label}
+                    </Text>
+                    {tab.id !== 'all' && (
+                      <View style={[
+                        s.filterCount,
+                        { backgroundColor: active ? 'rgba(255,255,255,0.25)' : theme.border },
+                      ]}>
+                        <Text style={[
+                          s.filterCountText,
+                          { color: active ? '#FFF' : theme.textMuted },
+                        ]}>
+                          {tab.id === 'tools'
+                            ? allFeedItems.filter(i => i.type === 'tool').length
+                            : allFeedItems.filter(i => i.type === 'post').length
+                          }
+                        </Text>
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
 
         {isSearching ? (
           /* ── Search Results ─────────────────────────────────────────────── */
@@ -835,7 +907,7 @@ export default function DiscoverScreen() {
               </View>
 
               {/* Show more / less */}
-              {allFeedItems.length > 10 && (
+              {filteredFeedItems.length > 10 && (
                 <Pressable
                   onPress={() => { Haptics.selectionAsync(); setShowAll(v => !v); }}
                   style={[s.showMoreBtn, {
@@ -848,7 +920,7 @@ export default function DiscoverScreen() {
                     size={20} color="#A78BFA"
                   />
                   <Text style={[s.showMoreTxt, { color: '#A78BFA' }]}>
-                    {showAll ? 'عرض أقل' : `عرض ${allFeedItems.length - 10} عنصر إضافي`}
+                    {showAll ? 'عرض أقل' : `عرض ${filteredFeedItems.length - 10} عنصر إضافي`}
                   </Text>
                 </Pressable>
               )}
@@ -1002,6 +1074,20 @@ const createStyles = (theme: any) => StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 11,
   },
   aiChipTxt: { fontSize: 12, fontFamily: 'Cairo_400Regular', flex: 1 },
+
+  // Filter tabs
+  filterBar: { marginBottom: 8 },
+  filterScroll: { paddingHorizontal: 16, gap: 8, paddingVertical: 4 },
+  filterChip: {
+    flexDirection: 'row' as const, alignItems: 'center' as const, gap: 5,
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 9999, borderWidth: 1.5,
+  },
+  filterChipText: { fontSize: 13, fontFamily: 'Cairo_600SemiBold' },
+  filterCount: {
+    minWidth: 20, height: 20, borderRadius: 10,
+    paddingHorizontal: 5, alignItems: 'center' as const, justifyContent: 'center' as const,
+  },
+  filterCountText: { fontSize: 10, fontFamily: 'Cairo_700Bold' },
 
   // Show more
   showMoreBtn: {
