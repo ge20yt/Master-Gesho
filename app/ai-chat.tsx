@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { useTheme } from '../contexts/ThemeContext';
 import { getSupabaseClient } from '@/template';
+import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 
 const { width: W } = Dimensions.get('window');
 const C4 = 'Cairo_400Regular';
@@ -104,7 +105,7 @@ const bb = StyleSheet.create({
 });
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
-export default function AIChatScreen() {
+function AIChatInner() {
   const { theme } = useTheme();
   const router    = useRouter();
   const insets    = useSafeAreaInsets();
@@ -284,6 +285,15 @@ export default function AIChatScreen() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+export default function AIChatScreen() {
+  const router = useRouter();
+  return (
+    <ErrorBoundary onNavigateHome={() => router.replace('/(tabs)' as any)}>
+      <AIChatInner />
+    </ErrorBoundary>
   );
 }
 

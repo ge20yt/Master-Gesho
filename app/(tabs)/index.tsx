@@ -27,6 +27,8 @@ import {
   FeedItem, ToolFeedItem, PostFeedItem,
 } from '../../services/smartFeedService';
 import { getAIProfile } from '../../services/onboardingService';
+import { SkeletonToolCard } from '../../components/ui/SkeletonToolCard';
+import { SkeletonPostCard } from '../../components/ui/SkeletonPostCard';
 
 const { width: SW } = Dimensions.get('window');
 const R = 20; // card border radius
@@ -594,12 +596,29 @@ export default function DiscoverScreen() {
   const totalSearchResults = filteredTools.length + filteredPosts.length;
   const s = useMemo(() => createStyles(theme), [theme]);
 
-  // ── Loading ────────────────────────────────────────────────────────────────
+  // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) {
     return (
-      <SafeAreaView edges={['top']} style={[s.container, s.centered]}>
-        <ActivityIndicator size="large" color={theme.primary} />
-        <Text style={[s.loadingTxt, { color: theme.textMuted }]}>جارٍ تحميل المحتوى...</Text>
+      <SafeAreaView edges={['top']} style={s.container}>
+        {/* Header skeleton */}
+        <View style={s.header}>
+          <View>
+            <View style={{ width: 120, height: 22, borderRadius: 8, backgroundColor: theme.surface }} />
+            <View style={{ width: 180, height: 13, borderRadius: 6, backgroundColor: theme.surface, marginTop: 6 }} />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View style={[s.notifBtn, { backgroundColor: theme.surface, borderColor: theme.border }]} />
+            <View style={[s.notifBtn, { backgroundColor: theme.surface, borderColor: theme.border }]} />
+          </View>
+        </View>
+        {/* Search skeleton */}
+        <View style={{ marginHorizontal: 16, marginVertical: 10, height: 46, borderRadius: 12, backgroundColor: theme.surface }} />
+        {/* Feed skeletons — 2 tool cards + 1 post card + 2 tool cards */}
+        <SkeletonToolCard />
+        <SkeletonToolCard />
+        <SkeletonPostCard />
+        <SkeletonToolCard />
+        <SkeletonToolCard />
       </SafeAreaView>
     );
   }

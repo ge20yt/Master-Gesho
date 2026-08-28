@@ -16,6 +16,7 @@ import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAppContext } from '../contexts/AppContext';
+import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 
 const { width: W } = Dimensions.get('window');
 const C4 = 'Cairo_400Regular';
@@ -159,7 +160,7 @@ const pm = StyleSheet.create({
 });
 
 // ─── Main screen ───────────────────────────────────────────────────────────────
-export default function CompareScreen() {
+function CompareInner() {
   const { theme }  = useTheme();
   const router     = useRouter();
   const insets     = useSafeAreaInsets();
@@ -301,6 +302,15 @@ export default function CompareScreen() {
         theme={theme}
       />
     </SafeAreaView>
+  );
+}
+
+export default function CompareScreen() {
+  const router = useRouter();
+  return (
+    <ErrorBoundary onNavigateHome={() => router.replace('/(tabs)' as any)}>
+      <CompareInner />
+    </ErrorBoundary>
   );
 }
 
